@@ -19,7 +19,6 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	</flow>
 	<sub-flow name="asyncSub_Flow" doc:id="a138429e-a6b3-4851-845c-3e229d01c788" >
 		<set-payload value="we are in async flow" doc:name="Set Payload" doc:id="37c61a4a-ebf7-446b-af3d-cdc3a9c19d84" />
-		<logger level="INFO" doc:name="Logger" doc:id="a51b8f11-fcea-4fc2-adc7-b648e5723581" message="async sub flow "/>
 	</sub-flow>
 	<flow name="cacheFlow" doc:id="afbb1862-1e50-4f9c-80b2-9ed083e82c61" >
 		<http:listener doc:name="GET/cacheflow" doc:id="23bf5d2f-a489-4fc5-b227-fde0b4894f54" config-ref="HTTP_Listener_config" path="/cache"/>
@@ -27,6 +26,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<ee:cache doc:name="Cache" doc:id="7a888a8b-056d-4735-9e90-fe72eae9bd21" >
 			<flow-ref doc:name="Flow Reference" doc:id="b9855ce5-9e8d-4cd1-bb8b-c12d7dda0173" name="cacheSub_Flow"/>
 		</ee:cache>
+		<set-payload value='#[payload ++ " cache used"]' doc:name="Set Payload" doc:id="b33e3617-b54d-4a1a-87b3-7292a52f9d2c" />
 		<logger level="INFO" doc:name="Logger" doc:id="673ec46b-1b21-421e-936f-6c7fc953f70a" message="cache logger 2"/>
 	</flow>
 	<sub-flow name="cacheSub_Flow" doc:id="71f85f48-d9a4-408d-887d-894c6a6250a4" >
