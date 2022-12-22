@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="712bb633-9c94-4be2-971a-e5801163cdc1" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="462b0e5b-1a39-43ac-9a56-bdb6c9cf1ca0" />
+	<flow name="asyncflow" doc:id="374b494f-da4e-455e-9969-6a62fc2d14aa" >
+		<http:listener doc:name="GET/order" doc:id="29674dd0-824f-4188-93d6-165963ab62dd" config-ref="HTTP_Listener_config" path="/async" allowedMethods="GET"/>
+		<logger level="INFO" doc:name="Logger" doc:id="cf7679f8-757f-4eaa-81b5-2f91fdd07907" message="async logger 1"/>
+		<async doc:name="Async" doc:id="e581e90e-f843-4241-b362-8448cd8f9ecc" >
+			<flow-ref doc:name="Flow Reference" doc:id="286cea21-7e50-44d6-92c1-cb783836cd3a" name="asyncSub_Flow"/>
+		</async>
+		<logger level="INFO" doc:name="Logger" doc:id="820835fa-90da-49a7-b6d4-15e4bf96a90a" message="async logger 2"/>
+	</flow>
+	<sub-flow name="asyncSub_Flow" doc:id="a138429e-a6b3-4851-845c-3e229d01c788" >
+		<set-payload value="we are in async flow" doc:name="Set Payload" doc:id="37c61a4a-ebf7-446b-af3d-cdc3a9c19d84" />
+		<logger level="INFO" doc:name="Logger" doc:id="a51b8f11-fcea-4fc2-adc7-b648e5723581" message="async sub flow "/>
+	</sub-flow>
+	<flow name="cacheFlow" doc:id="afbb1862-1e50-4f9c-80b2-9ed083e82c61" >
+		<http:listener doc:name="GET/cacheflow" doc:id="23bf5d2f-a489-4fc5-b227-fde0b4894f54" config-ref="HTTP_Listener_config" path="/cache"/>
+		<logger level="INFO" doc:name="Logger" doc:id="2d526cc0-76e6-42cf-b259-5e03115a2fa0" message="cache logger 1"/>
+		<ee:cache doc:name="Cache" doc:id="7a888a8b-056d-4735-9e90-fe72eae9bd21" >
+			<flow-ref doc:name="Flow Reference" doc:id="b9855ce5-9e8d-4cd1-bb8b-c12d7dda0173" name="cacheSub_Flow"/>
+		</ee:cache>
+		<logger level="INFO" doc:name="Logger" doc:id="673ec46b-1b21-421e-936f-6c7fc953f70a" message="cache logger 2"/>
+	</flow>
+	<sub-flow name="cacheSub_Flow" doc:id="71f85f48-d9a4-408d-887d-894c6a6250a4" >
+		<set-payload value="we are in cache flow" doc:name="Set Payload" doc:id="e31d5d65-960b-4af1-af4d-51a8ec092ea5" />
+		<logger level="INFO" doc:name="Logger" doc:id="0f4519ff-fd19-4fa1-882a-dd2d3c7d6693" message="cache sub flow logger "/>
+	</sub-flow>
+	<flow name="foreachFlow" doc:id="4a55ff69-98c0-4d0a-a7af-0b9027ff8b47" >
+		<http:listener doc:name="GET/foreach" doc:id="949d2544-14af-4ccd-ab9e-0df57553bd8f" config-ref="HTTP_Listener_config" path="/foreach"/>
+		<set-payload value="#[[1,3,8,70,67]]" doc:name="[1,3,8,70,67]" doc:id="e7d5e73c-56b3-4eb0-a994-c18d9b7dc0ec" />
+		<logger level="INFO" doc:name="Logger" doc:id="a7e5226f-cd19-4477-9599-ab9b21fcbfca" message="before for each"/>
+		<foreach doc:name="For Each" doc:id="fd0adb34-79c1-4389-b38a-8491ec2d20a1" >
+			<set-payload value="#[payload + 20]" doc:name="Set Payload" doc:id="e50ee55a-f094-4738-a4d1-854453e67a47" />
+			<logger level="INFO" doc:name="Logger" doc:id="2b7ed200-d531-43a4-b298-aff185be3ef9" message="#[payload]"/>
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="7d818213-e5ff-448f-a385-a4d9984de253" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="5176fa92-3000-46c1-910d-5cb216eb7983" />
+		<logger level="INFO" doc:name="Logger" doc:id="3c621d38-f7c5-4ebe-b388-750bb57c9d62" message="after for each"/>
+	</flow>
+	<flow name="foreachtryFlow" doc:id="cb8e44e1-4d9a-4a73-98aa-d891180a2a3d" >
+		<http:listener doc:name="GET/foreachtryflow" doc:id="78be6df4-43fa-4e70-931a-cc9f1bde90d1" config-ref="HTTP_Listener_config" path="foreachtry" allowedMethods="GET"/>
+		<set-payload value="#[[1,2,3,4,5,6]]" doc:name="[1,2,3,4,5,6]" doc:id="cef9d213-91bf-473b-86df-236365626b67" />
+		<foreach doc:name="For Each" doc:id="82dc7767-0c0f-4b86-95e2-651a61378f79" batchSize="2">
+			<set-payload value="#[payload + 25]" doc:name="Set Payload" doc:id="67f959e6-6e74-4b8a-8638-01590ad7de74" />
+			<logger level="INFO" doc:name="Logger" doc:id="febf59a7-4155-47e9-8404-863998c32356" message="#[payload]" />
+		</foreach>
+		<ee:transform doc:name="Transform Message" doc:id="c9d1e56c-ceda-4dd6-8292-ef881dcba941" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="tryFlow1" doc:id="a1b47c0f-a640-4e6c-bf67-b0661a5ed914" >
+		<http:listener doc:name="Listener" doc:id="42002860-728c-4ef5-a512-80dc3aeedf44" config-ref="HTTP_Listener_config" path="/try1"/>
+		<set-payload value='before try' doc:name="Set Payload" doc:id="83f35c40-b561-42fc-80c0-e574b288a35c" />
+		<try doc:name="Try" doc:id="f453b4b9-a901-4727-9435-c14ed8f91e8b" >
+			<raise-error doc:name="Raise error" doc:id="0303a018-069d-4d24-82b5-c0dfb582ed0c" type="MULE:CONNECTIVITY" />
+			<set-payload value="inside sub flow" doc:name="Set Payload" doc:id="7e4583ca-1cbf-4125-8193-ab874f246ab4" />
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="02ca15d4-b5d3-4eb3-8734-01e469c62a48" >
+					<set-payload value="error in sub flow" doc:name="Set Payload" doc:id="851f84da-a16a-4f30-9019-972556ab8629" />
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<set-payload value='after try' doc:name="Set Payload" doc:id="271e3b77-8b7e-4bc5-8721-2abae5f36f63" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f3a386f1-879b-4925-b052-4e3016935712" >
+				<set-payload value="main flow error handler" doc:name="Set Payload" doc:id="a8fe3565-c6ad-40fd-8801-bd3c8f7a8ee2" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="tryFlow" doc:id="601ffd12-9c97-48e3-bb82-631e16b5e36d">
+		<http:listener doc:name="GET/tryflow" doc:id="864e6697-9055-4122-9656-3c37a69a10dc" config-ref="HTTP_Listener_config" path="/try" />
+		<set-payload value="before try" doc:name="Set Payload" doc:id="306b8010-bc50-40d5-a664-8e5c1b3f8799" />
+		<try doc:name="Try" doc:id="9ac12ede-462d-42d3-8530-436b51bce21a">
+			<raise-error doc:name="Raise error" doc:id="d9ef875b-3550-40c5-8608-d89c6a2f5552" type="MULE:EXPRESSION" />
+			<set-payload value="inside sub flow" doc:name="Set Payload" doc:id="e91d992c-057f-4d80-9057-5cbbc785357d" />
+			<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b0b5238e-529b-4755-8da4-4d8e2174a4bc" >
+					<set-payload value="error in sub flow" doc:name="Set Payload" doc:id="710b5fc8-fd9f-46fe-8c03-d244b18952d2" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<set-payload value="after try" doc:name="Set Payload" doc:id="43bcc041-e2ad-4b30-8423-b5f8f2b62374" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4f7639e0-f69b-4c64-a6ed-98e1d2959b9b" >
+				<set-payload value="main flow error handler" doc:name="Set Payload" doc:id="63a2231a-3c2c-40f8-8f18-f91ce3323643" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
