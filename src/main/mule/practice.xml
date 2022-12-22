@@ -31,7 +31,15 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	</flow>
 	<sub-flow name="cacheSub_Flow" doc:id="71f85f48-d9a4-408d-887d-894c6a6250a4" >
 		<set-payload value="we are in cache flow" doc:name="Set Payload" doc:id="e31d5d65-960b-4af1-af4d-51a8ec092ea5" />
-		<logger level="INFO" doc:name="Logger" doc:id="0f4519ff-fd19-4fa1-882a-dd2d3c7d6693" message="cache sub flow logger "/>
+		<ee:transform doc:name="Transform Message" doc:id="65462541-ff3a-4644-9652-63e340b55053" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+"cache sub flow logger "
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</sub-flow>
 	<flow name="foreachFlow" doc:id="4a55ff69-98c0-4d0a-a7af-0b9027ff8b47" >
 		<http:listener doc:name="GET/foreach" doc:id="949d2544-14af-4ccd-ab9e-0df57553bd8f" config-ref="HTTP_Listener_config" path="/foreach"/>
