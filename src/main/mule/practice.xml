@@ -8,9 +8,6 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="712bb633-9c94-4be2-971a-e5801163cdc1" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
-	<ee:object-store-caching-strategy name="Caching_Strategy" doc:name="Caching Strategy" doc:id="462b0e5b-1a39-43ac-9a56-bdb6c9cf1ca0" />
-	<flow name="asyncflow" doc:id="374b494f-da4e-455e-9969-6a62fc2d14aa" >
-		<http:listener doc:name="GET/order" doc:id="29674dd0-824f-4188-93d6-165963ab62dd" config-ref="HTTP_Listener_config" path="/async" allowedMethods="GET"/>
 		<logger level="INFO" doc:name="Logger" doc:id="cf7679f8-757f-4eaa-81b5-2f91fdd07907" message="async logger 1"/>
 		<async doc:name="Async" doc:id="e581e90e-f843-4241-b362-8448cd8f9ecc" >
 			<flow-ref doc:name="Flow Reference" doc:id="286cea21-7e50-44d6-92c1-cb783836cd3a" name="asyncSub_Flow"/>
